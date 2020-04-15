@@ -23,7 +23,7 @@ function userAction() {
             type: "list",
             name: "request",
             message: "What would you like to do?",
-            choices: ["Add employee", "Add department", "Add role", "View employees", "View departments", "View roles", "Quit"]
+            choices: ["Add employee", "Add department", "Add role", "View employees", "View departments", "View roles", "Update an employee's role", "Quit"]
         }
     ]).then(function (res) {
         switch (res.request) {
@@ -44,6 +44,9 @@ function userAction() {
                 break;
             case "View roles":
                 viewRole();
+                break;
+            case "Update an employee's role":
+                updateRole();
                 break;
             case "Quit":
                 connection.end();
@@ -129,29 +132,54 @@ function addRole() {
     })
 }
 
-function viewDepartment(){
-    connection.query("SELECT * FROM departments", function(err, results){
-        if(err){
+function viewDepartment() {
+    connection.query("SELECT * FROM departments", function (err, results) {
+        if (err) {
             throw err;
         }
-        console.table(results)
+        console.table(results);
+        userAction();
     })
 }
 
-function viewEmployee(){
-    connection.query("SELECT * FROM employee", function(err, results){
-        if(err){
+function viewEmployee() {
+    connection.query("SELECT * FROM employee", function (err, results) {
+        if (err) {
             throw err;
         }
-        console.table(results)
+        console.table(results);
+        userAction();
     })
 }
 
-function viewRole(){
-    connection.query("SELECT * FROM role", function(err, results){
-        if(err){
+function viewRole() {
+    connection.query("SELECT * FROM role", function (err, results) {
+        if (err) {
             throw err;
         }
-        console.table(results)
+        console.table(results);
+        userAction();
+    })
+}
+
+function updateRole(){
+    inquirer.prompt([
+        {
+            type: "input",
+            name: "employID",
+            message: "What is the ID of the employee?"
+        },
+        {
+            type: "input",
+            name: "newRoleID",
+            message: "What is the ID of their new role?"
+        }
+    ]).then(function(res){
+        connection.query("UPDATE employee SET role_id = ? WHERE id = ?", [res.employID, res.newRoleID], function(err, result){
+            if(err){
+                throw err;
+            }
+            userAction();
+        })
     })
 }
